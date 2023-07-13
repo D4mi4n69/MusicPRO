@@ -5,7 +5,8 @@
     <div class="card">
         <div class="card-body">
             {% if producto %}
-            <h2 class="text-center">Administración de Pedidos Despachados</h2> <hr>
+            <h2 class="text-center">Administración de Despachos</h2> <hr>
+            
             <table class="table table-striped table-hover table-responsive-sm">
                 <tr>
                     <th>Código Boleta</th>
@@ -25,14 +26,13 @@
                     <td> ${{ p.total }} </td>
 
                     <td>
-                        <a href="{% url 'confirmar_entrega' p.codigo_boleta %}" class="btn btn-success btn-sm" style="border-radius: 50%;"><i class="fa-solid fa-pen"></i></a>
+                        <a href="{% url 'confirmar_despacho' p.codigo_boleta %}" class="btn btn-success btn-sm" style="border-radius: 50%;"><i class="fa-solid fa-pen"></i></a>
                     </td>                
                 </tr>
                 {% endfor %}
             </table>
             {% else %}
-            <h2 style="margin-top: 10%; margin-bottom: 10%; text-align: center;">De momento no se encuntran pedidos 
-                que se encuentren en estado "Entrega"</h2>
+            <h2 style="margin-top: 10%; margin-bottom: 10%; text-align: center;">De momento no se encuntran pedidos que se encuentren en estado "Despacho"</h2>
             {% endif %}
         </div>
     </div>

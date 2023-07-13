@@ -1,5 +1,5 @@
 from django import forms
-from .models import Perfil, Producto, Entrega
+from .models import Perfil, Producto, Boleta
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
@@ -37,19 +37,37 @@ class CustomUserCreationForm(UserCreationForm):
         if last_name and len(last_name.strip()) < 3 or len(last_name.strip()) > 15:
             self.add_error("last_name", "El apellido debe tener entre 3 y 15 caracteres sin espacios en blanco.")
 
-class EntregaForm(forms.ModelForm):
-    confirmacion = forms.BooleanField(required=False, widget=forms.CheckboxInput)
-
-    class Meta:
-        model = Entrega
-        fields = ['name', 'confirmacion']
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['name'].label = 'Nombre del Producto'
-
 
 class formularioModificacionPerfil(forms.ModelForm):
     class Meta:
         model = Perfil
         fields = ['imagen']
+        
+
+
+class BoletaForm(forms.ModelForm):
+    class Meta:
+        model = Boleta
+        fields = ['estado', 'cantidad_productos', 'total', 'fecha']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['estado'].label = 'Estado de la boleta'
+        self.fields['cantidad_productos'].label = 'Cantidad de Productos'
+        self.fields['total'].label = 'Total'
+        self.fields['fecha'].label = 'Fecha de la compra'
+
+        instance = kwargs.get('instance')
+        if instance:
+            self.fields['cantidad_productos'].widget.attrs['readonly'] = True
+            self.fields['total'].widget.attrs['readonly'] = True
+            self.fields['fecha'].widget.attrs['readonly'] = True
+            self.fields['estado'].widget.attrs['readonly'] = True
+            
+            self.fields['cantidad_productos'].widget.attrs['value'] = instance.cantidad_productos
+            self.fields['total'].widget.attrs['value'] = instance.total
+            self.fields['fecha'].widget.attrs['value'] = instance.fecha
+            self.fields['estado'].widget.attrs['value'] = instance.estado
+
+            
+        

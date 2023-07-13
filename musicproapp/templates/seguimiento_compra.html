@@ -39,7 +39,7 @@
                     <div class="card-body">
                         <h2 class="card-title">Estado</h2>
                         {% if boleta.estado %}
-                            <p class="card-text badge badge-success">Confirmado</p>
+                            <p class="card-text badge badge-success">{{boleta.estado}}</p>
                             <img src="{% static 'img/endelivery.png' %}" class="img-fluid" alt="Orden Lista" style="max-height: 200px;">
                         {% else %}
                             <p class="card-text badge badge-primary">En proceso</p>
