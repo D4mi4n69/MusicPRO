@@ -47,7 +47,8 @@ INSTALLED_APPS = [
     'crispy_bootstrap4',
     'django.contrib.humanize',
     'transbank',
-    'rest_framework'
+    'rest_framework',
+    'mathfilters'
 ]
 
 TRANSBANK_API_KEY = 'tu_api_key'

@@ -68,14 +68,14 @@ class Compra():
             compra = self.session["compra"] = {}
         self.compra = compra
 
-    def agregar(self, producto):
+    def agregar(self, producto, cantidad):
         self.compra[producto.codigo_producto] = {
             "producto_id": producto.codigo_producto,
             "nombre": producto.nombre,
             "categoria": producto.categoria.nombre,
             "precio": str (producto.precio),
-            "cantidad": 1,
-            "total": producto.precio
+            "cantidad": cantidad,
+            "total": producto.precio*cantidad
             }
         self.guardar_compra()
 

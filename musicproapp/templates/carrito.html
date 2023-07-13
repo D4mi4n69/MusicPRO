@@ -36,6 +36,9 @@
         
     </table>
     <h2>Precio total: ${{ total|intcomma }}</h2>
+    {% if descuento == 1 %}
+    <h4>¡Has recibido un descuento de un 10% por estar registrado con nosotros!</h4>
+    {% endif %}
 
 
 

@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block head %}
+{% load mathfilters %}
+{% load humanize %}
 <style>
     .card-img-top-container {
         max-height: 300px; /* Ajusta aquí el valor de altura máxima deseado */
@@ -103,6 +105,67 @@
         <button type="submit" class="btn btn-primary">Filtrar</button>
     </form>
 
+    <!-- conversor de monedas -->
+    <form method="GET" action="{% url 'index' %}">
+        <label for="moneda">Cambiar moneda:</label>
+        <select name="moneda" id="moneda">
+            <!-- <option value="">CLP</option> -->
+            <option {% if moneda == "AED" %}selected{% endif %} value="AED">AED</option>
+            <option {% if moneda == "ARS" %}selected{% endif %} value="ARS">ARS</option>
+            <option {% if moneda == "AUD" %}selected{% endif %} value="AUD">AUD</option>
+            <option {% if moneda == "BGN" %}selected{% endif %} value="BGN">BGN</option>
+            <option {% if moneda == "BRL" %}selected{% endif %} value="BRL">BRL</option>
+            <option {% if moneda == "BSD" %}selected{% endif %} value="BSD">BSD</option>
+            <option {% if moneda == "CAD" %}selected{% endif %} value="CAD">CAD</option>
+            <option {% if moneda == "CHF" %}selected{% endif %} value="CHF">CHF</option>
+            <option {% if moneda == "CLP" %}selected{% endif %} value="CLP" selected>CLP</option>
+            <option {% if moneda == "CNY" %}selected{% endif %} value="CNY">CNY</option>
+            <option {% if moneda == "COP" %}selected{% endif %} value="COP">COP</option>
+            <option {% if moneda == "CZK" %}selected{% endif %} value="CZK">CZK</option>
+            <option {% if moneda == "DKK" %}selected{% endif %} value="DKK">DKK</option>
+            <option {% if moneda == "DOP" %}selected{% endif %} value="DOP">DOP</option>
+            <option {% if moneda == "EGP" %}selected{% endif %} value="EGP">EGP</option>
+            <option {% if moneda == "EUR" %}selected{% endif %} value="EUR">EUR</option>
+            <option {% if moneda == "FJD" %}selected{% endif %} value="FJD">FJD</option>
+            <option {% if moneda == "GBP" %}selected{% endif %} value="GBP">GBP</option>
+            <option {% if moneda == "GTQ" %}selected{% endif %} value="GTQ">GTQ</option>
+            <option {% if moneda == "HKD" %}selected{% endif %} value="HKD">HKD</option>
+            <option {% if moneda == "HRK" %}selected{% endif %} value="HRK">HRK</option>
+            <option {% if moneda == "HUF" %}selected{% endif %} value="HUF">HUF</option>
+            <option {% if moneda == "IDR" %}selected{% endif %} value="IDR">IDR</option>
+            <option {% if moneda == "ILS" %}selected{% endif %} value="ILS">ILS</option>
+            <option {% if moneda == "INR" %}selected{% endif %} value="INR">INR</option>
+            <option {% if moneda == "ISK" %}selected{% endif %} value="ISK">ISK</option>
+            <option {% if moneda == "JPY" %}selected{% endif %} value="JPY">JPY</option>
+            <option {% if moneda == "KRW" %}selected{% endif %} value="KRW">KRW</option>
+            <option {% if moneda == "KZT" %}selected{% endif %} value="KZT">KZT</option>
+            <option {% if moneda == "MXN" %}selected{% endif %} value="MXN">MXN</option>
+            <option {% if moneda == "MYR" %}selected{% endif %} value="MYR">MYR</option>
+            <option {% if moneda == "NOK" %}selected{% endif %} value="NOK">NOK</option>
+            <option {% if moneda == "NZD" %}selected{% endif %} value="NZD">NZD</option>
+            <option {% if moneda == "PAB" %}selected{% endif %} value="PAB">PAB</option>
+            <option {% if moneda == "PEN" %}selected{% endif %} value="PEN">PEN</option>
+            <option {% if moneda == "PHP" %}selected{% endif %} value="PHP">PHP</option>
+            <option {% if moneda == "PKR" %}selected{% endif %} value="PKR">PKR</option>
+            <option {% if moneda == "PLN" %}selected{% endif %} value="PLN">PLN</option>
+            <option {% if moneda == "PYG" %}selected{% endif %} value="PYG">PYG</option>
+            <option {% if moneda == "RON" %}selected{% endif %} value="RON">RON</option>
+            <option {% if moneda == "RUB" %}selected{% endif %} value="RUB">RUB</option>
+            <option {% if moneda == "SAR" %}selected{% endif %} value="SAR">SAR</option>
+            <option {% if moneda == "SEK" %}selected{% endif %} value="SEK">SEK</option>
+            <option {% if moneda == "SGD" %}selected{% endif %} value="SGD">SGD</option>
+            <option {% if moneda == "THB" %}selected{% endif %} value="THB">THB</option>
+            <option {% if moneda == "TRY" %}selected{% endif %} value="TRY">TRY</option>
+            <option {% if moneda == "TWD" %}selected{% endif %} value="TWD">TWD</option>
+            <option {% if moneda == "UAH" %}selected{% endif %} value="UAH">UAH</option>
+            <option {% if moneda == "USD" %}selected{% endif %} value="USD">USD</option>
+            <option {% if moneda == "UYU" %}selected{% endif %} value="UYU">UYU</option>
+            <option {% if moneda == "VND" %}selected{% endif %} value="VND">VND</option>
+            <option {% if moneda == "ZAR" %}selected{% endif %} value="ZAR">ZAR</option>
+        </select>
+        <button type="submit" class="btn btn-primary">Cambiar moneda</button>
+    </form>
+
     <div class="row mb-5">
         {% if productos %}
             {% for p in productos %}
@@ -115,7 +178,13 @@
                     {% endif %} 
                     <div class="card-body">
                         <h4 class="card-title"> {{ p.nombre }} </h4>
-                        <h5>${{p.precio}}</h5>
+                        <h5>
+                            {% if conversion.result == "success" %}
+                                $ {{ p.precio|mul:conversion.conversion_rate|floatformat:2|intcomma }}
+                            {% else %}
+                                ${{p.precio|intcomma}}
+                            {% endif %}
+                        </h5>
                         <p class="card-text">
                             {{ p.categoria }}
                         </p>

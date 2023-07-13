@@ -13,6 +13,7 @@ from transbank.webpay.webpay_plus.transaction import Transaction
 
 
 import random
+import requests
 
 
 def index(request):
@@ -29,7 +30,18 @@ def index(request):
         'categorias': categorias,
         'categoria_filtrada': categoria_buscada
     }
+
+        #Lo siguiente es la api para la conversion de moneda
+    convertor = request.GET.get('moneda')
+    if convertor:
+        context["moneda"]= convertor
+        url = 'https://v6.exchangerate-api.com/v6/4a502b3c64d89bf561e72b72/pair/CLP/'+str(convertor)
+        response = requests.get(url)
+        conversion = response.json()
+        context["conversion"]=conversion
+
     return render(request, 'index.html', context)
+
 
 
 def producto_detalle(request, producto_id):
@@ -49,16 +61,24 @@ def carrito(request):
     producto=Producto.objects.all()
     print(carrito.carrito)  # Agregar este print para verificar los datos del carrito
     suma=0
+    descuento=0
 
     #Esto es para sacar el total a pagar de los productos
     for key,i in carrito.carrito.items():
         suma=int(i["total"])+suma
+
+    if len(carrito.carrito.items()) > 4:
+        if request.user.is_authenticated:
+            suma= suma*0.9
+            descuento=1
+
 
  
     context = {
         'carrito': carrito,
         'request': request,
         'total':suma,
+        'descuento':descuento
     }
 
 
@@ -70,7 +90,7 @@ def carrito(request):
             break
 
     #Lo siguiente es la api de transbank
-    try:
+    if request.method == 'POST':
         orden=len(Boleta.objects.all())+1 
         buy_order=str(orden)
         session_id= request.session.session_key
@@ -86,7 +106,7 @@ def carrito(request):
 
         limpiar_comprapreliminar(request)
         for key,i in carrito.carrito.items():
-            agregar_comprapreliminar(request=request, id=i["producto_id"])
+            agregar_comprapreliminar(request=request, id=i["producto_id"], cantidad=i["cantidad"])
 
         compra = Compra(request) #Quitarlo después ------------------------------------
         print("lista de compra preliminar: "+str(compra.compra)) #Quitarlo después ------------------------------------
@@ -94,10 +114,9 @@ def carrito(request):
         response= (Transaction()).create(buy_order, session_id, amount, return_url)
         context["response"]=response
         return render(request, 'carrito.html', context)
-    
-    except:
-
+    else:
         return render(request, 'carrito.html', context)
+
 
     
 def registro(request):
@@ -198,11 +217,12 @@ def agregar_producto(request,id):
     producto = Producto.objects.get(codigo_producto=id)
     carrito_compra.agregar(producto=producto)
     url_anterior = request.META.get('HTTP_REFERER')
+    return redirect(to='carrito')
 
-    if 'carrito' in url_anterior:
-        return redirect('carrito')
-    else:
-        return redirect('index')
+    # if 'carrito' in url_anterior:      ------------ Decidí comentarlo de momento porque no sé que querian hacer aca XD ----------------
+    #     return redirect('carrito')
+    # else:
+    #     return redirect('index')
 
 
 # def eliminar_producto(request, id):
@@ -224,10 +244,10 @@ def limpiar_carrito(request):
 
 #------------------------------- Funciones preliminares para la compra --------------------------------------------------------
 
-def agregar_comprapreliminar(request,id):
+def agregar_comprapreliminar(request,id,cantidad):
     carrito_compra= Compra(request)
     producto = Producto.objects.get(codigo_producto=id)
-    carrito_compra.agregar(producto=producto)
+    carrito_compra.agregar(producto=producto, cantidad=cantidad)
 
 def limpiar_comprapreliminar(request):
     carrito_compra= Compra(request)
@@ -265,28 +285,6 @@ def confirmar_producto(request, id):
     
 
 
-def webpay_plus_create(request):
-    context={}
-    print("Webpay Plus Transaction.create")
-    buy_order = str(random.randrange(1000000, 99999999))
-    session_id = str(random.randrange(1000000, 99999999))
-    amount = random.randrange(10000, 1000000)
-    return_url = request.build_absolute_uri('/') +'resultado_compra//'
-
-    create_request = {
-        "buy_order": buy_order,
-        "session_id": session_id,
-        "amount": amount,
-        "return_url": return_url
-    }
-
-    response = (Transaction()).create(buy_order, session_id, amount, return_url)
-    print("Este es el response: "+ str(response))
-    context["response"]=response
-
-    return render(request, 'create.html', context)   
-
-
 def resultado_compra(request):
     compra = Compra(request)
     boleta = Boleta
@@ -307,8 +305,12 @@ def resultado_compra(request):
 
         for key, i in compra.compra.items():
             compras.objects.create(nombre_producto=i["nombre"], boleta=Boleta.objects.get(codigo_boleta=numero_boleta), cantidad=i["cantidad"], total=i["total"])
+            producto=Producto.objects.get(codigo_producto=i["producto_id"])
+            producto.stock=producto.stock-int(i["cantidad"]) #Con esto ya se estaría descontando la cantidad comprada del stock
+            producto.save()
 
         context["mensaje"] = "Has realizado tu compra exitosamente, tu número de boleta es: " + str(numero_boleta)
+        limpiar_carrito(request) #Esto es para que se limpie el carrito una vez realizada la compra
 
     return render(request, 'resultado_pago.html', context)
 
