@@ -7,8 +7,10 @@
     <link rel="stylesheet" href="{% static 'css/carrito.css' %}">
 </head>
 
-
 <div class="container mt-5">
+    <br>
+    <br>
+    <br>
     <h1>Carrito de compras</h1>
     {% if request.session.carrito.items %}
 
@@ -85,8 +87,35 @@
             </select>
         </div>
         <div class="input_info">
-            <label for="direccion">Numero de casa</label>
-            <input type="number" placeholder="Ingresa numero de casa/departamento">
+            <label for="direccion">País</label>
+            <select id="tipo-vivienda" name="tipo-vivienda">
+                <option value="Chile" selected>Chile</option>
+                <option value="Argentina">Argentina</option>
+                <option value="Brasil">Brasil</option>
+                <option value="Perú">Perú</option>
+                <option value="Colombia">Colombia</option>
+                <option value="Uruguay">Uruguay</option>
+                <option value="Paraguay">Paraguay</option>
+                <option value="Bolivia">Bolivia</option>
+                <option value="Ecuador">Ecuador</option>
+                <option value="Venezuela">Venezuela</option>
+                <option value="Panama">Panama</option>
+                <option value="Costa Rica">Costa Rica</option>
+                <option value="Cuba">Cuba</option>
+                <option value="Guayana Francesa">Guayana Francesa</option>
+                <option value="Granada">Granada</option>
+                <option value="Guatemala">Guatemala</option>
+                <option value="Haití">Haití</option>
+                <option value="Honduras">Honduras</option>
+                <option value="Jamaica">Jamaica</option>
+                <option value="México">México</option>
+                <option value="Nicaragua">Nicaragua</option>
+                <option value="República Dominicana">República Dominicana</option>
+                <option value="Surinam">Surinam</option>
+                <option value="EEUU">EEUU</option>
+                <option value="España">España</option>
+                <option value="Andorra">Andorra</option>
+            </select>
         </div>
         <div class="input_info">
             <label for="direccion">Telefono de contacto</label>
@@ -100,12 +129,12 @@
 
 <script>
     function toggleDiv() {
-      var div = document.getElementById("id_direccion");
-      if (div.style.display === "none") {
-        div.style.display = "block";
-      } else {
-        div.style.display = "none";
-      }
+        var div = document.getElementById("id_direccion");
+        if (div.style.display === "none") {
+            div.style.display = "block";
+        } else {
+            div.style.display = "none";
+        }
     }
 </script>
 
