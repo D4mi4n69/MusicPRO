@@ -45,48 +45,28 @@
     <h4>¡Has recibido un descuento de un 10% por estar registrado con nosotros!</h4>
     {% endif %}
 
-
-
-
-
-
-
-
-    <form action="{{ response.url }}" method="POST">
-        {% csrf_token %}
-        <input type="hidden" name="token_ws" value="{{ response.token }}">
-        <a href="{% url 'limpiar' %}" class="btn btn-secondary">Limpiar carrito</a>
-        <button type="submit" class="btn btn-primary" {% if error %} disabled {% endif %}>Continuar compra</button>
-    </form>
-    {% if error %}
-    <h5 style="color: #ff6461;">{{error}}</h5>
-    {% endif %}
-
-    {% else %}
-    <h3 style="margin-top: 10%; text-align: center;">Parece ser que tu carrito se encuentra vacio, ¡revisa los productos
-        que tenemos disponibles!</h3>
-    {% endif %}
-    <button class="boton" onclick="toggleDiv()">Agregar dirección</button>
+    <button type="submit" class="btn btn-primary" onclick="toggleDiv()" {% if error %} disabled {% endif %}>Continuar compra</button>
+    <a href="{% url 'limpiar' %}" class="btn btn-secondary">Limpiar carrito</a>
 </div>
 
 <!-- Aqui va la direccion oculta, si es posible luego mirare como hacer bien una transicion -->
 <br>
 <br>
 <div id="id_direccion" style="display: none;">
-    <form action="" class="contenedor">
+    <form action="{{ response.url }}" method="POST" class="contenedor">
         <h2>Ingresa tu dirección de envío</h2>
-        <div class="input_info">
+        <div class="input_info1">
             <label for="direccion">Dirección</label>
-            <input type="text" placeholder="Incluye numero de calle">
+            <input type="text" placeholder="Incluye numero de calle" required>
         </div>
-        <div class="input_info">
+        <div class="input_info2">
             <label for="tipo-vivienda">Tipo de vivienda:</label>
             <select id="tipo-vivienda" name="tipo-vivienda">
                 <option value="casa" selected>Casa</option>
                 <option value="departamento">Departamento</option>
             </select>
         </div>
-        <div class="input_info">
+        <div class="input_info1">
             <label for="direccion">País</label>
             <select id="tipo-vivienda" name="tipo-vivienda">
                 <option value="Chile" selected>Chile</option>
@@ -117,12 +97,24 @@
                 <option value="Andorra">Andorra</option>
             </select>
         </div>
-        <div class="input_info">
+        <div class="input_info2">
             <label for="direccion">Telefono de contacto</label>
-            <input type="number" placeholder="Ingresa tu numero">
+            <input type="number" placeholder="Ingresa tu numero" required>
         </div>
-        <button type="submit" class="boton">Guardar dirección</button>
+        {% csrf_token %}
+        <input type="hidden" name="token_ws" value="{{ response.token }}">
+        <button type="submit" style="grid-column: 1/-1; width: 200px; justify-self: center;" class="btn btn-primary" {% if error %} disabled {% endif %}>Confirmar compra</button>
     </form>
+    {% if error %}
+    <h5 style="color: #ff6461;">{{error}}</h5>
+    {% endif %}
+
+    {% else %}
+    <h3 style="margin-top: 10%; text-align: center;">Parece ser que tu carrito se encuentra vacio, ¡revisa los productos
+        que tenemos disponibles!</h3>
+    {% endif %}
+</div>
+</form>
 </div>
 
 <!-- Aqui termina el "agregar direccion" -->

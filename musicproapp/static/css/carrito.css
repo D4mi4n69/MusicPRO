@@ -1,12 +1,11 @@
 .contenedor{
     display: grid;
     grid-template-columns: repeat(2 ,1fr);
-    background-color: #5f788a44;
     margin-left: 20%;
     margin-right: 20%;
     padding: 20px;
     border-radius: 15px;
-    gap: 0.5em;
+    gap: 1em;
     transition: all 0.5s;
 }
 
@@ -20,11 +19,21 @@
     padding-bottom: 10px;
 }
 
-.contenedor > .input_info > label, input, select{
+.contenedor > .input_info1 > label, input, select{
     width: 100%;
+    justify-self: end;
 }
 
-.contenedor > .input_info > label{
+.contenedor > .input_info1 > label{
+    font-weight: 600;
+}
+
+.contenedor > .input_info2 > label, input, select{
+    width: 100%;
+    justify-self: start;
+}
+
+.contenedor > .input_info2 > label{
     font-weight: 600;
 }
 
