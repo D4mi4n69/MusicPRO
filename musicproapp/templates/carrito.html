@@ -3,6 +3,9 @@
 {% block content %}
 {% load humanize %}
 
+<head>
+    <link rel="stylesheet" href="{% static 'css/carrito.css' %}">
+</head>
 
 
 <div class="container mt-5">
@@ -20,20 +23,20 @@
             </tr>
         </thead>
         <tbody>
-                {% for key, value in request.session.carrito.items %} 
-                    <tr>
-                        <td>{{ value.nombre }}</td>
-                        <td>${{ value.precio|intcomma }}</td>
-                        <td>{{ value.cantidad }}</td>
-                        <td>${{ value.total|intcomma }}</td>
-                        <td>
-                            <a href="{% url 'agregar' value.producto_id %}" class="btn btn-danger">+</a>
-                            <a href="{% url 'restar' value.producto_id %}" class="btn btn-warning">-</a>
-                        </td>
-                    </tr>
-                {% endfor %}
+            {% for key, value in request.session.carrito.items %}
+            <tr>
+                <td>{{ value.nombre }}</td>
+                <td>${{ value.precio|intcomma }}</td>
+                <td>{{ value.cantidad }}</td>
+                <td>${{ value.total|intcomma }}</td>
+                <td>
+                    <a href="{% url 'agregar' value.producto_id %}" class="btn btn-danger">+</a>
+                    <a href="{% url 'restar' value.producto_id %}" class="btn btn-warning">-</a>
+                </td>
+            </tr>
+            {% endfor %}
         </tbody>
-        
+
     </table>
     <h2>Precio total: ${{ total|intcomma }}</h2>
     {% if descuento == 1 %}
@@ -44,8 +47,8 @@
 
 
 
-    
-    
+
+
 
     <form action="{{ response.url }}" method="POST">
         {% csrf_token %}
@@ -53,21 +56,57 @@
         <a href="{% url 'limpiar' %}" class="btn btn-secondary">Limpiar carrito</a>
         <button type="submit" class="btn btn-primary" {% if error %} disabled {% endif %}>Continuar compra</button>
     </form>
-    {% if error %}  
+    {% if error %}
     <h5 style="color: #ff6461;">{{error}}</h5>
     {% endif %}
 
     {% else %}
-    <h3 style="margin-top: 10%; text-align: center;">Parece ser que tu carrito se encuentra vacio, ¡revisa los productos que tenemos disponibles!</h3>
+    <h3 style="margin-top: 10%; text-align: center;">Parece ser que tu carrito se encuentra vacio, ¡revisa los productos
+        que tenemos disponibles!</h3>
     {% endif %}
-
+    <button class="boton" onclick="toggleDiv()">Agregar dirección</button>
 </div>
 
+<!-- Aqui va la direccion oculta, si es posible luego mirare como hacer bien una transicion -->
+<br>
+<br>
+<div id="id_direccion" style="display: none;">
+    <form action="" class="contenedor">
+        <h2>Ingresa tu dirección de envío</h2>
+        <div class="input_info">
+            <label for="direccion">Dirección</label>
+            <input type="text" placeholder="Incluye numero de calle">
+        </div>
+        <div class="input_info">
+            <label for="tipo-vivienda">Tipo de vivienda:</label>
+            <select id="tipo-vivienda" name="tipo-vivienda">
+                <option value="casa" selected>Casa</option>
+                <option value="departamento">Departamento</option>
+            </select>
+        </div>
+        <div class="input_info">
+            <label for="direccion">Numero de casa</label>
+            <input type="number" placeholder="Ingresa numero de casa/departamento">
+        </div>
+        <div class="input_info">
+            <label for="direccion">Telefono de contacto</label>
+            <input type="number" placeholder="Ingresa tu numero">
+        </div>
+        <button type="submit" class="boton">Guardar dirección</button>
+    </form>
+</div>
 
+<!-- Aqui termina el "agregar direccion" -->
 
-
+<script>
+    function toggleDiv() {
+      var div = document.getElementById("id_direccion");
+      if (div.style.display === "none") {
+        div.style.display = "block";
+      } else {
+        div.style.display = "none";
+      }
+    }
+</script>
 
 {% endblock %}
-
-
-
