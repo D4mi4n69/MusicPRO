@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="{% static 'css/nosotros.css' %}">
+    <title>Quiénes somos - MUSIC PRO</title>
+</head>
+
+<body>
+    <div class="conteiner">
+        <h1>¿Que es MUSICPRO?</h1>
+        <article class="article">
+            <p>En MUSIC PRO, somos una reconocida distribuidora de instrumentos y accesorios musicales en Chile, con una
+                sólida
+                trayectoria en el mercado desde 1988. Nos enorgullece ser parte de la industria que impulsa la pasión
+                por la
+                música y brinda a nuestros clientes una amplia variedad de opciones para expresarse a través de ella.
+            </p>
+            <p>Desde nuestros inicios, hemos sido testigos del crecimiento exponencial de la industria de fabricación de
+                instrumentos musicales y el surgimiento de nuevos géneros musicales que han enriquecido la escena
+                musical. Como
+                resultado, nos hemos adaptado y evolucionado para ofrecer una experiencia de compra excepcional tanto en
+                nuestras tiendas físicas como en nuestra plataforma en línea.</p>
+            <p>En nuestras sedes ubicadas estratégicamente en la región metropolitana de Santiago, incluyendo
+                Providencia,
+                Maipú, Santiago y Vitacura, nos esforzamos por ofrecer un extenso catálogo de productos de alta calidad.
+                Desde
+                guitarras acústicas y eléctricas de renombradas marcas como Ibáñez, ESP, Gibson y Jackson, hasta bajos
+                activos y
+                pasivos, sets de batería, amplificadores, accesorios y mucho más, en MUSIC PRO encontrarás todo lo que
+                necesitas
+                para potenciar tu creatividad musical.</p>
+            <p>Nuestro compromiso va más allá de ofrecer productos de calidad. Nos preocupamos por brindar un servicio
+                excepcional y una experiencia de compra única. Nuestro equipo de profesionales apasionados y expertos en
+                el área
+                está siempre dispuesto a brindarte asesoramiento personalizado, orientación y responder a todas tus
+                consultas,
+                para que encuentres el instrumento perfecto que se ajuste a tus necesidades y estilo musical.</p>
+            <p>Además, en MUSIC PRO nos mantenemos a la vanguardia de la tecnología, y por eso hemos desarrollado una
+                plataforma
+                en línea que te permite explorar nuestro catálogo de productos, realizar compras de manera rápida y
+                segura, y
+                acceder a promociones exclusivas desde la comodidad de tu hogar.</p>
+            <p>En resumen, en MUSIC PRO nos apasiona la música y estamos comprometidos en ofrecerte lo mejor en
+                instrumentos y
+                accesorios musicales. Nuestra amplia selección de productos, combinada con nuestro servicio de calidad y
+                atención personalizada, nos convierte en tu aliado confiable en el mundo de la música.</p>
+            <p>¡Descubre tu potencial musical con MUSIC PRO!</p>
+        </article>
+        <aside class="asidebar">
+            <div>
+                <img src="{% static 'img/mas-guitarras.jpg' %}" alt="" class="image">
+            </div>
+            <br>
+            <div>
+                <img src="{% static 'img/guitarras.jpg' %}" alt="" class="image">
+            </div>
+            <br>
+            <div>
+                <img src="{% static 'img/reproductor.jpg' %}" alt="" class="image">
+            </div>
+        </aside>
+    </div>
+</body>
+
+</html>
+
+
+{% endblock %}

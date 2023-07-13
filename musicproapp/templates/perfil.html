@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="content-section">
+  <h2 class="m-5">Perfil</h2>
+    <div class="media">
+        <img class="rounded-circle account-img" src="{{ user.perfil.imagen.url }}">
+        <div class="media-body">
+            <h2 class="account-heading">{{ first_name }} {{last_name}} </h2>
+            <p class="text-secondary">{{ user.username }}</p>
+            <p class="text-secondary"> {{user.email}} </p>
+        </div>
+    </div>
+    <form action="" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <fieldset class="form-group">
+            <legend class="border-bottom mb-4">Cambiar Imagen de Perfil</legend>
+            {{ p_form.imagen.label_tag }}
+            {{ p_form.imagen }}
+        </fieldset>
+        <div class="form-group">
+            <button class="btn btn-outline-info" type="submit">Guardar Cambios</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+
+
+

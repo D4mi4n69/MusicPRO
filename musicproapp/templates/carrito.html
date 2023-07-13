@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+{% load humanize %}
+
+
+
+<div class="container mt-5">
+    <h1>Carrito de compras</h1>
+    {% if request.session.carrito.items %}
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Precio</th>
+                <th>Cantidad</th>
+                <th>Total</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+                {% for key, value in request.session.carrito.items %} 
+                    <tr>
+                        <td>{{ value.nombre }}</td>
+                        <td>${{ value.precio|intcomma }}</td>
+                        <td>{{ value.cantidad }}</td>
+                        <td>${{ value.total|intcomma }}</td>
+                        <td>
+                            <a href="{% url 'agregar' value.producto_id %}" class="btn btn-danger">+</a>
+                            <a href="{% url 'restar' value.producto_id %}" class="btn btn-warning">-</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+        </tbody>
+        
+    </table>
+    <h2>Precio total: ${{ total|intcomma }}</h2>
+
+
+
+
+
+    
+    
+
+    <form action="{{ response.url }}" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="token_ws" value="{{ response.token }}">
+        <a href="{% url 'limpiar' %}" class="btn btn-secondary">Limpiar carrito</a>
+        <button type="submit" class="btn btn-primary" {% if error %} disabled {% endif %}>Continuar compra</button>
+    </form>
+    {% if error %}  
+    <h5 style="color: #ff6461;">{{error}}</h5>
+    {% endif %}
+
+    {% else %}
+    <h3 style="margin-top: 10%; text-align: center;">Parece ser que tu carrito se encuentra vacio, ¡revisa los productos que tenemos disponibles!</h3>
+    {% endif %}
+
+</div>
+
+
+
+
+
+{% endblock %}
+
+
+

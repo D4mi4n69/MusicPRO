@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+{% block head %}
+<style>
+    .card-img-top-container {
+        max-height: 500px; /* Ajusta aquí el valor de altura máxima deseado */
+        overflow: hidden;
+    }
+
+    .card-content {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+    }
+
+    .card-button-container {
+        margin-top: auto;
+    }
+
+    .button {
+    background-color:#5f788a ; 
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+}
+
+</style>
+{% endblock %}
+{% block content %}
+<div class="row mb-5" style="background-color:  #e7e7e7 ; margin: 5%; border-radius: 10px; padding: 50px;">
+
+    {% if producto %}
+    <div class="col-4" style="margin-left: 5%; margin-top: 3%;">
+        <div class="card text-center card-content">
+            {% if producto.imagen %}
+                 <img src="{{ producto.imagen.url }}" alt="{{producto.nombre}}" class="card-img-top-container mx-auto img-fluid">
+            {% else %} 
+                <img src="{% static 'img/rayo.jpg' %}" class="card-img-top mx-auto img-fluid">
+            {% endif %} 
+        </div>
+    </div>
+    <div class="col-6" style="margin-left: 5%; margin-top: 3%;">
+        <a href="{% url 'index' %}?categoria={{producto.categoria}}">{{producto.categoria}}</a>
+        <h1 class="card-title"> {{ producto.nombre }}</h1>
+        <br>
+        <br>
+        <div style="background-color:#c7c7c7; border-radius: 10px; padding:5px">
+            <p>{{producto.descripcion}}</p>
+        </div>
+        <br>
+        <h3>Precio: ${{producto.precio | intcomma}}</h3>
+        <br>
+        <a type="button" href="{% url 'agregar' producto.codigo_producto %}" class="button" style="border-radius: 10px;">Comprar</a>
+    </div>
+</div>
+
+{% else %}
+    <p>No hay productos disponibles</p>
+{% endif %}
+
+
+{% endblock %}
