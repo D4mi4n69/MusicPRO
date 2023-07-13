@@ -1,30 +1,37 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
-<div class="content-section">
-  <h2 class="m-5">Perfil</h2>
-    <div class="media">
-        <img class="rounded-circle account-img" src="{{ user.perfil.imagen.url }}">
-        <div class="media-body">
-            <h2 class="account-heading">{{ first_name }} {{last_name}} </h2>
-            <p class="text-secondary">{{ user.username }}</p>
-            <p class="text-secondary"> {{user.email}} </p>
+
+<head>
+    <link rel="stylesheet" href="{% static 'css/perfil.css' %}">
+    <title>Quiénes somos - MUSIC PRO</title>
+</head>
+
+<div class="contenedor_perfil">
+    <h2>Perfil</h2>
+    <div class="foto_perfil">
+        <div class="contenido_imagen">
+            <img class="image_perfil" src="{{ user.perfil.imagen.url }}">
         </div>
     </div>
-    <form action="" method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        <fieldset class="form-group">
-            <legend class="border-bottom mb-4">Cambiar Imagen de Perfil</legend>
-            {{ p_form.imagen.label_tag }}
-            {{ p_form.imagen }}
-        </fieldset>
-        <div class="form-group">
-            <button class="btn btn-outline-info" type="submit">Guardar Cambios</button>
+    <div class="cuerpo_perfil">
+        <h2>Nombre: {{ first_name }} {{last_name}} </h2>
+        <div class="parrafo_1">
+            <p>Usuario: {{ user.username }}</p>
+            <p>Email: {{user.email}} </p>
         </div>
-    </form>
+    </div>
+
+    <form action="" method="POST" enctype="multipart/form-data" class="form_style">
+        {% csrf_token %}
+        <legend class="field_style">Cambiar Imagen de Perfil</legend>
+        <div class="form_image">
+            {{ p_form.imagen }}
+        </div>
+        <div class="boton_form">
+            <button class="btn btn-outline-info" type="submit">Actualizar Cambios</button>
+        </div>
+</div>
+</form>
 </div>
 {% endblock %}
-
-
-
-

@@ -4,7 +4,13 @@
     margin: 10%;
 }
 
-.conteiner >h1 {
+.conteiner > h1 {
+
+    border-radius: 15px;
+    justify-self: center;
+    background-color: #e7e7e7;
+    width: 600px;
+    padding: 20px;
     margin-bottom: 40px;
     font-size: 50px;
     text-transform: uppercase;
