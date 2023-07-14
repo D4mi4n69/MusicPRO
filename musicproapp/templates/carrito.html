@@ -45,16 +45,32 @@
 
     <button type="submit" class="btn btn-primary" onclick="toggleDiv()" {% if error %} disabled {% endif %}>Continuar compra</button>
     <a href="{% url 'limpiar' %}" class="btn btn-secondary">Limpiar carrito</a>
+    {% if error %}
+    <h5 style="color: #ff6461;">{{error}}</h5>
+    {% endif %}
+
+    {% else %}
+    <h3 style="margin-top: 10%; text-align: center; padding: 10px; background-color: #fff; border-radius: 15px; border:2px solid #ff6461;">Parece ser que tu carrito se encuentra vacio, ¡revisa los productos
+        que tenemos disponibles!</h3>
+    {% endif %}
 </div>
 
 
 <br>
 <div id="id_direccion" style="display: none;">
-    <form action="{{ response.url }}" method="POST" class="contenedor">
+    <form action="{{response.url}}" method="POST" class="contenedor">
         <h2>Ingresa tu dirección de envío</h2>
         <div class="input_info1">
+            <label for="nombre">Nombre</label>
+            <input type="text" name="nombre" id="nombre" placeholder="Nombre de la persona a recibir" required>
+        </div>
+        <div class="input_info2">
+            <label for="apellido">Apellido</label>
+            <input type="text" name="apellido" id="apellido" placeholder="Apellido de la persona a recibir" required>
+        </div>
+        <div class="input_info1">
             <label for="direccion">Dirección</label>
-            <input type="text" placeholder="Incluye numero de calle" required>
+            <input type="text" name="direccion" id="direccion" placeholder="Incluye numero de calle" required>
         </div>
         <div class="input_info2">
             <label for="tipo-vivienda">Tipo de vivienda:</label>
@@ -65,7 +81,7 @@
         </div>
         <div class="input_info1">
             <label for="direccion">País</label>
-            <select id="tipo-vivienda" name="tipo-vivienda">
+            <select id="pais" name="pais">
                 <option value="Chile" selected>Chile</option>
                 <option value="Argentina">Argentina</option>
                 <option value="Brasil">Brasil</option>
@@ -96,21 +112,17 @@
         </div>
         <div class="input_info2">
             <label for="direccion">Telefono de contacto</label>
-            <input type="number" placeholder="Ingresa tu numero" required>
+            <input type="number" name="numero" id="numero" placeholder="Ingresa tu numero" required>
         </div>
         {% csrf_token %}
         <input type="hidden" name="token_ws" value="{{ response.token }}">
+        <input type="hidden" name="suma" value="{{ total }}">
+        <input type="hidden" name="url" value="{{ response.url }}">
         <button type="submit" style="grid-column: 1/-1; width: 200px; justify-self: center;" class="btn btn-primary" {% if error %} disabled {% endif %}>Confirmar compra</button>
     </form>
-    {% if error %}
-    <h5 style="color: #ff6461;">{{error}}</h5>
-    {% endif %}
-
-    {% else %}
-    <h3 style="margin-top: 10%; text-align: center; padding: 10px; background-color: #fff; border-radius: 15px; border:2px solid #ff6461;">Parece ser que tu carrito se encuentra vacio, ¡revisa los productos
-        que tenemos disponibles!</h3>
-    {% endif %}
+    
 </div>
+
 </form>
 </div>
 

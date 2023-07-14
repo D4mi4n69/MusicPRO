@@ -22,5 +22,5 @@ urlpatterns = [
     path('confirmar_entrega/<id>', views.confirmar_entrega, name='confirmar_entrega'),  #Contador
     path('resultado_compra/', views.resultado_compra, name='resultado_compra'),
     path('seguimiento_compra/', views.seguimiento_compra, name='seguimiento_compra'),
-    path('perfil/', views.perfil, name='perfil')
+    path('perfil/', views.perfil, name='perfil'),
 ]

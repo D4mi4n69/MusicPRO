@@ -90,7 +90,7 @@ def carrito(request):
             break
 
     #Lo siguiente es la api de transbank
-    if request.method == 'POST':
+    try:
         orden=len(Boleta.objects.all())+1 
         buy_order=str(orden)
         session_id= request.session.session_key
@@ -102,7 +102,10 @@ def carrito(request):
             "session_id": session_id,
             "amount" : amount,
             "return_url": return_url
-        }
+            }
+        
+        response= (Transaction()).create(buy_order, session_id, amount, return_url)
+        context["response"]=response
 
         limpiar_comprapreliminar(request)
         for key,i in carrito.carrito.items():
@@ -111,11 +114,13 @@ def carrito(request):
         compra = Compra(request) #Quitarlo después ------------------------------------
         print("lista de compra preliminar: "+str(compra.compra)) #Quitarlo después ------------------------------------
 
-        response= (Transaction()).create(buy_order, session_id, amount, return_url)
-        context["response"]=response
         return render(request, 'carrito.html', context)
-    else:
+
+    except:
         return render(request, 'carrito.html', context)
+    
+
+
 
 
     
@@ -357,39 +362,47 @@ def confirmar_entrega(request, id):
 
 
 def resultado_compra(request):
-    compra = Compra(request)
-    boleta = Boleta
-    compras = Compras
-    context = {}
-    token = request.GET.get("token_ws")
-    print("commit for token_ws: {}".format(token))
+    try:
+        compra = Compra(request)
+        boleta = Boleta
+        compras = Compras
+        context = {}
+        token = request.GET.get("token_ws")
+        print("commit for token_ws: {}".format(token))
 
-    response = (Transaction()).commit(token=token)
+        response = (Transaction()).commit(token=token)
 
-    # En el caso de que el pago se haya efectuado correctamente:
-    if response['status'] == "AUTHORIZED":
-        suma = 0
-        numero_boleta = len(boleta.objects.all()) + 1
-        fecha_actual= date.today()
-        for key, i in compra.compra.items():
-            suma = int(i["total"]) + suma
-        boleta.objects.create(codigo_boleta=numero_boleta, cantidad_productos=len(compra.compra.items()), total=suma, estado="Pagado", fecha=fecha_actual)  
-        # Tipos de estado:
-        # Pagado -> Cuando recien se efecuta la compra
-        # Aceptado / Rechazado 
-        # Enviado
-        # Entregado
+        # En el caso de que el pago se haya efectuado correctamente:
+        if response['status'] == "AUTHORIZED":
+            suma = 0
+            numero_boleta = len(boleta.objects.all()) + 1
+            fecha_actual= date.today()
+            for key, i in compra.compra.items():
+                suma = int(i["total"]) + suma
+            boleta.objects.create(codigo_boleta=numero_boleta, cantidad_productos=len(compra.compra.items()), total=suma, estado="Pagado", fecha=fecha_actual)  
+            # Tipos de estado:
+            # Pagado -> Cuando recien se efecuta la compra
+            # Aceptado / Rechazado 
+            # Enviado
+            # Entregado
 
-        for key, i in compra.compra.items():
-            compras.objects.create(nombre_producto=i["nombre"], boleta=Boleta.objects.get(codigo_boleta=numero_boleta), cantidad=i["cantidad"], total=i["total"])
-            producto=Producto.objects.get(codigo_producto=i["producto_id"])
-            producto.stock=producto.stock-int(i["cantidad"]) #Con esto ya se estaría descontando la cantidad comprada del stock
-            producto.save()
+            for key, i in compra.compra.items():
+                compras.objects.create(nombre_producto=i["nombre"], boleta=Boleta.objects.get(codigo_boleta=numero_boleta), cantidad=i["cantidad"], total=i["total"])
+                producto=Producto.objects.get(codigo_producto=i["producto_id"])
+                producto.stock=producto.stock-int(i["cantidad"]) #Con esto ya se estaría descontando la cantidad comprada del stock
+                producto.save()
 
-        context["mensaje"] = "Has realizado tu compra exitosamente, tu número de boleta es: " + str(numero_boleta)
-        limpiar_carrito(request) #Esto es para que se limpie el carrito una vez realizada la compra
+            context["mensaje"] = "Has realizado tu compra exitosamente, tu número de boleta es: " + str(numero_boleta)
+            limpiar_carrito(request) #Esto es para que se limpie el carrito una vez realizada la compra
 
-    return render(request, 'resultado_pago.html', context)
+            return render(request, 'resultado_pago.html', context)
+        
+        else:
+            context["mensaje"]="Al parecer ha ocurrido un error al realizad tu compra, intentalo nuevamente más tarde."
+            context["error"]=1
+            return render(request, 'resultado_pago.html', context)
+    except:
+        return redirect(to='index')
 
 
 
