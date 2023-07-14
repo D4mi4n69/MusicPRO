@@ -1,7 +1,7 @@
 from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth import authenticate, login
-from .models import Producto, Categoria, Boleta, Compras
+from .models import Producto, Categoria, Boleta, Compras, Perfil, User
 from .forms import CustomUserCreationForm, ProductoForm, formularioModificacionPerfil, BoletaForm
 from django.contrib.auth.decorators import login_required, user_passes_test
 from musicproapp.compra import Carrito, Compra
@@ -128,11 +128,16 @@ def registro(request):
     datos = {
         'form': CustomUserCreationForm()
     }
+    perfil=Perfil
+    user=User
 
     if request.method == 'POST':
         formulario = CustomUserCreationForm(data=request.POST)
         if formulario.is_valid():
             formulario.save()
+            nombre_usuario=formulario.instance.username
+            usuario=user.objects.get(username=nombre_usuario)
+            perfil.objects.create(user=usuario)
             user = authenticate(username=formulario.cleaned_data["username"], password=formulario.cleaned_data["password1"])
             login(request, user)
             return redirect(to="index")
