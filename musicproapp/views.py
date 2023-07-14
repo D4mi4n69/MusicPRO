@@ -10,19 +10,10 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from musicproapp.compra import Carrito, Compra
 from django.core.paginator import Paginator
 from django.contrib import messages
-<<<<<<< HEAD
 from transbank.error.transbank_error import TransbankError
 from transbank.webpay.webpay_plus.transaction import Transaction
 import matplotlib.pyplot as plt
 import random
-=======
-from datetime import date
-
-from transbank.error.transbank_error import TransbankError
-from transbank.webpay.webpay_plus.transaction import Transaction
-
-
->>>>>>> a944121cefe93ace9c1278402f209cba6657db01
 import requests
 from django.db.models import Sum
 from django.contrib.auth.models import User
@@ -318,7 +309,6 @@ def confirmar_producto(request, id):
  #------------------------------------------------------------------- Bodeguero -----------------------------------------------------------
 
 @login_required
-@user_passes_test(lambda u: u.is_superuser)
 def registro_despacho(request):
     producto = Boleta.objects.all().order_by('codigo_boleta').filter(estado="Aceptado")
 
@@ -328,7 +318,6 @@ def registro_despacho(request):
     return render(request, 'bodeguero/registro-despacho.html', context)
 
 @login_required
-@user_passes_test(lambda u: u.is_superuser)
 def confirmar_despacho(request, id):
     productos = get_object_or_404(Boleta, codigo_boleta=id)
     context = {

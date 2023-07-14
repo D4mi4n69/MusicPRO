@@ -37,6 +37,20 @@
                         <a class="nav-item nav-link" href="{% url 'informe_ventas' %}">Reporte ventas mensuales</a>
 
                         {% endif %}
+                        
+                        {% if user.bodeguero %}
+                        <a class="nav-item nav-link" href="{% url 'registro_despacho' %}">Registro de despacho</a>
+                        {% endif %}
+
+                        {% if user.contador %}
+                        <a class="nav-item nav-link" href="{% url 'registro_entrega' %}">Registro de entrega</a>
+                        {% endif %}
+
+                        {% if user.vendedor %}
+                        <a class="nav-item nav-link" href="{% url 'registro_producto' %}">Registro de producto</a>
+                        {% endif %}
+
+                        
                     </div>
                     <!-- Navbar Right Side -->
                     <div class="navbar-nav">

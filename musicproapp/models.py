@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from PIL import Image
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
 class tipoProducto(models.Model):
     id_tipo_producto = models.AutoField(primary_key=True)
@@ -29,9 +30,17 @@ class Producto(models.Model):
     def __str__(self):
         return self.nombre
     
+class Entrega(models.Model):
+    codigo_entrega = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=100, verbose_name="Nombre del Producto")
+    confirmacion = models.BooleanField(null=False, blank=False)
+
+    def __str__(self):
+        return self.codigo_entrega
+    
 
 class Boleta(models.Model):
-    estado = models.CharField(max_length=50, verbose_name="Estado del Producto")
+    estado = models.CharField(max_length=50, verbose_name="Estado del producto")
     codigo_boleta = models.AutoField(primary_key=True)
     cantidad_productos=models.IntegerField()
     total = models.IntegerField()
@@ -66,3 +75,21 @@ class Perfil(models.Model):
             output_size = (300, 300)
             img.thumbnail(output_size)
             img.save(self.imagen.path)
+
+class Bodeguero(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.user.username
+    
+class Vendedor(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.user.username
+    
+class Contador(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.user.username
