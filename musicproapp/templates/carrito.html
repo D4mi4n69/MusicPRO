@@ -3,13 +3,16 @@
 {% block content %}
 {% load humanize %}
 
+<head>
+    <link rel="stylesheet" href="{% static 'css/carrito.css' %}">
+</head>
 
-
+<div class="contenedor_carrito">
 <div class="container mt-5">
-    <h1>Carrito de compras</h1>
+    <h1 style="padding: 10px; background-color: #fff; width: 370px; border-radius: 15px;">Carrito de compras</h1>
     {% if request.session.carrito.items %}
 
-    <table class="table">
+    <table class="table" style="background-color: #fff;">
         <thead>
             <tr>
                 <th>Producto</th>
@@ -20,54 +23,120 @@
             </tr>
         </thead>
         <tbody>
-                {% for key, value in request.session.carrito.items %} 
-                    <tr>
-                        <td>{{ value.nombre }}</td>
-                        <td>${{ value.precio|intcomma }}</td>
-                        <td>{{ value.cantidad }}</td>
-                        <td>${{ value.total|intcomma }}</td>
-                        <td>
-                            <a href="{% url 'agregar' value.producto_id %}" class="btn btn-danger">+</a>
-                            <a href="{% url 'restar' value.producto_id %}" class="btn btn-warning">-</a>
-                        </td>
-                    </tr>
-                {% endfor %}
+            {% for key, value in request.session.carrito.items %}
+            <tr>
+                <td>{{ value.nombre }}</td>
+                <td>${{ value.precio|intcomma }}</td>
+                <td>{{ value.cantidad }}</td>
+                <td>${{ value.total|intcomma }}</td>
+                <td>
+                    <a href="{% url 'agregar' value.producto_id %}" class="btn btn-danger">+</a>
+                    <a href="{% url 'restar' value.producto_id %}" class="btn btn-warning">-</a>
+                </td>
+            </tr>
+            {% endfor %}
         </tbody>
-        
+
     </table>
-    <h2>Precio total: ${{ total|intcomma }}</h2>
+    <h2 style="padding: 10px; background-color: #fff; width: 320px;">Precio total: ${{ total|intcomma }}</h2>
     {% if descuento == 1 %}
     <h4>¡Has recibido un descuento de un 10% por estar registrado con nosotros!</h4>
     {% endif %}
 
-
-
-
-
-    
-    
-
-    <form action="{{ response.url }}" method="POST">
-        {% csrf_token %}
-        <input type="hidden" name="token_ws" value="{{ response.token }}">
-        <a href="{% url 'limpiar' %}" class="btn btn-secondary">Limpiar carrito</a>
-        <button type="submit" class="btn btn-primary" {% if error %} disabled {% endif %}>Continuar compra</button>
-    </form>
-    {% if error %}  
+    <button type="submit" class="btn btn-primary" onclick="toggleDiv()" {% if error %} disabled {% endif %}>Continuar compra</button>
+    <a href="{% url 'limpiar' %}" class="btn btn-secondary">Limpiar carrito</a>
+    {% if error %}
     <h5 style="color: #ff6461;">{{error}}</h5>
     {% endif %}
 
     {% else %}
-    <h3 style="margin-top: 10%; text-align: center;">Parece ser que tu carrito se encuentra vacio, ¡revisa los productos que tenemos disponibles!</h3>
+    <h3 style="margin-top: 10%; text-align: center; padding: 10px; background-color: #fff; border-radius: 15px; border:2px solid #ff6461;">Parece ser que tu carrito se encuentra vacio, ¡revisa los productos
+        que tenemos disponibles!</h3>
     {% endif %}
+</div>
 
+
+<br>
+<div id="id_direccion" style="display: none;">
+    <form action="{{response.url}}" method="POST" class="contenedor">
+        <h2>Ingresa tu dirección de envío</h2>
+        <div class="input_info1">
+            <label for="nombre">Nombre</label>
+            <input type="text" name="nombre" id="nombre" placeholder="Nombre de la persona a recibir" required>
+        </div>
+        <div class="input_info2">
+            <label for="apellido">Apellido</label>
+            <input type="text" name="apellido" id="apellido" placeholder="Apellido de la persona a recibir" required>
+        </div>
+        <div class="input_info1">
+            <label for="direccion">Dirección</label>
+            <input type="text" name="direccion" id="direccion" placeholder="Incluye numero de calle" required>
+        </div>
+        <div class="input_info2">
+            <label for="tipo-vivienda">Tipo de vivienda:</label>
+            <select id="tipo-vivienda" name="tipo-vivienda">
+                <option value="casa" selected>Casa</option>
+                <option value="departamento">Departamento</option>
+            </select>
+        </div>
+        <div class="input_info1">
+            <label for="direccion">País</label>
+            <select id="pais" name="pais">
+                <option value="Chile" selected>Chile</option>
+                <option value="Argentina">Argentina</option>
+                <option value="Brasil">Brasil</option>
+                <option value="Perú">Perú</option>
+                <option value="Colombia">Colombia</option>
+                <option value="Uruguay">Uruguay</option>
+                <option value="Paraguay">Paraguay</option>
+                <option value="Bolivia">Bolivia</option>
+                <option value="Ecuador">Ecuador</option>
+                <option value="Venezuela">Venezuela</option>
+                <option value="Panama">Panama</option>
+                <option value="Costa Rica">Costa Rica</option>
+                <option value="Cuba">Cuba</option>
+                <option value="Guayana Francesa">Guayana Francesa</option>
+                <option value="Granada">Granada</option>
+                <option value="Guatemala">Guatemala</option>
+                <option value="Haití">Haití</option>
+                <option value="Honduras">Honduras</option>
+                <option value="Jamaica">Jamaica</option>
+                <option value="México">México</option>
+                <option value="Nicaragua">Nicaragua</option>
+                <option value="República Dominicana">República Dominicana</option>
+                <option value="Surinam">Surinam</option>
+                <option value="EEUU">EEUU</option>
+                <option value="España">España</option>
+                <option value="Andorra">Andorra</option>
+            </select>
+        </div>
+        <div class="input_info2">
+            <label for="direccion">Telefono de contacto</label>
+            <input type="number" name="numero" id="numero" placeholder="Ingresa tu numero" required>
+        </div>
+        {% csrf_token %}
+        <input type="hidden" name="token_ws" value="{{ response.token }}">
+        <input type="hidden" name="suma" value="{{ total }}">
+        <input type="hidden" name="url" value="{{ response.url }}">
+        <button type="submit" style="grid-column: 1/-1; width: 200px; justify-self: center;" class="btn btn-primary" {% if error %} disabled {% endif %}>Confirmar compra</button>
+    </form>
+    
+</div>
+
+</form>
 </div>
 
 
 
-
+<script>
+    function toggleDiv() {
+        var div = document.getElementById("id_direccion");
+        if (div.style.display === "none") {
+            div.style.display = "block";
+        } else {
+            div.style.display = "none";
+        }
+    }
+</script>
 
 {% endblock %}
-
-
-

@@ -4,16 +4,25 @@ from django.conf import settings
 from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth import authenticate, login
-from .models import Producto, Categoria, Entrega, Boleta, Compras
-from .forms import CustomUserCreationForm, ProductoForm, EntregaForm, formularioModificacionPerfil
+from .models import Producto, Categoria, Boleta, Compras, Perfil, User
+from .forms import CustomUserCreationForm, ProductoForm, formularioModificacionPerfil, BoletaForm
 from django.contrib.auth.decorators import login_required, user_passes_test
 from musicproapp.compra import Carrito, Compra
 from django.core.paginator import Paginator
 from django.contrib import messages
+<<<<<<< HEAD
 from transbank.error.transbank_error import TransbankError
 from transbank.webpay.webpay_plus.transaction import Transaction
 import matplotlib.pyplot as plt
 import random
+=======
+from datetime import date
+
+from transbank.error.transbank_error import TransbankError
+from transbank.webpay.webpay_plus.transaction import Transaction
+
+
+>>>>>>> a944121cefe93ace9c1278402f209cba6657db01
 import requests
 from django.db.models import Sum
 from django.contrib.auth.models import User
@@ -96,7 +105,7 @@ def carrito(request):
             break
 
     #Lo siguiente es la api de transbank
-    if request.method == 'POST':
+    try:
         orden=len(Boleta.objects.all())+1 
         buy_order=str(orden)
         session_id= request.session.session_key
@@ -108,7 +117,10 @@ def carrito(request):
             "session_id": session_id,
             "amount" : amount,
             "return_url": return_url
-        }
+            }
+        
+        response= (Transaction()).create(buy_order, session_id, amount, return_url)
+        context["response"]=response
 
         limpiar_comprapreliminar(request)
         for key,i in carrito.carrito.items():
@@ -117,11 +129,13 @@ def carrito(request):
         compra = Compra(request) #Quitarlo después ------------------------------------
         print("lista de compra preliminar: "+str(compra.compra)) #Quitarlo después ------------------------------------
 
-        response= (Transaction()).create(buy_order, session_id, amount, return_url)
-        context["response"]=response
         return render(request, 'carrito.html', context)
-    else:
+
+    except:
         return render(request, 'carrito.html', context)
+    
+
+
 
 
     
@@ -129,11 +143,16 @@ def registro(request):
     datos = {
         'form': CustomUserCreationForm()
     }
+    perfil=Perfil
+    user=User
 
     if request.method == 'POST':
         formulario = CustomUserCreationForm(data=request.POST)
         if formulario.is_valid():
             formulario.save()
+            nombre_usuario=formulario.instance.username
+            usuario=user.objects.get(username=nombre_usuario)
+            perfil.objects.create(user=usuario)
             user = authenticate(username=formulario.cleaned_data["username"], password=formulario.cleaned_data["password1"])
             login(request, user)
             return redirect(to="index")
@@ -259,11 +278,82 @@ def limpiar_comprapreliminar(request):
     carrito_compra= Compra(request)
     carrito_compra.limpiar()  
 
+ #------------------------------------------------------------------- Vendedor -----------------------------------------------------------
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def registro_producto(request):
+    producto = Boleta.objects.all().order_by('codigo_boleta').filter(estado="Pagado")
+
+    context = {
+        'producto' : producto
+    }
+    return render(request, 'vendedor/registro-entrega.html', context)
+
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def confirmar_producto(request, id):
+    productos = get_object_or_404(Boleta, codigo_boleta=id)
+    context = {
+        'form': BoletaForm(instance = productos)
+    }
+    if request.method=='POST':
+        formulario = BoletaForm(data=request.POST, instance=productos, files=request.FILES)
+        if formulario.is_valid():
+            if request.POST["value"] == "Rechazar Pedido":
+                formulario.instance.estado="Rechazado"
+                formulario.save()
+                messages.success(request, "Pedido rechazado exitosamente.")
+                return redirect(to="registro_producto")
+            else:
+                formulario.instance.estado="Aceptado"
+                formulario.save()
+                messages.success(request, "Pedido confirmado exitosamente.")
+                return redirect(to="registro_producto")
+        context["form"] = formulario
+        
+              
+    return render(request, 'vendedor/confirmar-producto.html', context)
+
+
+ #------------------------------------------------------------------- Bodeguero -----------------------------------------------------------
+
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def registro_despacho(request):
+    producto = Boleta.objects.all().order_by('codigo_boleta').filter(estado="Aceptado")
+
+    context = {
+        'producto' : producto
+    }
+    return render(request, 'bodeguero/registro-despacho.html', context)
+
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def confirmar_despacho(request, id):
+    productos = get_object_or_404(Boleta, codigo_boleta=id)
+    context = {
+        'form': BoletaForm(instance = productos)
+    }
+    if request.method=='POST':
+        formulario = BoletaForm(data=request.POST, instance=productos, files=request.FILES)
+        if formulario.is_valid():
+            formulario.instance.estado="Despachado"
+            formulario.save()
+            messages.success(request, "Pedido despachado exitosamente.")
+            return redirect(to="registro_despacho")
+        context["form"] = formulario
+        
+              
+    return render(request, 'bodeguero/confirmar-despacho.html', context)
+
+    
+ #------------------------------------------------------------------- Contador -----------------------------------------------------------
 
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
 def registro_entrega(request):
-    producto = Producto.objects.all().order_by('codigo_producto')
+    producto = Boleta.objects.all().order_by('codigo_boleta').filter(estado="Despachado")
+
     context = {
         'producto' : producto
     }
@@ -271,54 +361,68 @@ def registro_entrega(request):
 
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
-def confirmar_producto(request, id):
-    entrega = get_object_or_404(Entrega, codigo_entrega=id)
-    if request.method == 'POST':
-        formulario = EntregaForm(data=request.POST, instance=entrega, files=request.FILES)
-        if formulario.is_valid():
-            formulario.save()
-            return redirect('confirmar_producto', id=id)
-    else:
-        formulario = EntregaForm(instance=entrega)
-
+def confirmar_entrega(request, id):
+    productos = get_object_or_404(Boleta, codigo_boleta=id)
     context = {
-        'form': formulario,
-        'entrega': entrega,
+        'form': BoletaForm(instance = productos)
     }
-    return render(request, 'contador/confirmar-producto.html', context)
+    if request.method=='POST':
+        formulario = BoletaForm(data=request.POST, instance=productos, files=request.FILES)
+        if formulario.is_valid():
+            formulario.instance.estado="Entregado"
+            formulario.save()
+            messages.success(request, "Pedido marcado como entregado exitosamente.")
+            return redirect(to="registro_entrega")
+        context["form"] = formulario
+        
+              
+    return render(request, 'contador/confirmar-entrega.html', context)
 
 
-    
 
 
 def resultado_compra(request):
-    compra = Compra(request)
-    boleta = Boleta
-    compras = Compras
-    context = {}
-    token = request.GET.get("token_ws")
-    print("commit for token_ws: {}".format(token))
+    try:
+        compra = Compra(request)
+        boleta = Boleta
+        compras = Compras
+        context = {}
+        token = request.GET.get("token_ws")
+        print("commit for token_ws: {}".format(token))
 
-    response = (Transaction()).commit(token=token)
+        response = (Transaction()).commit(token=token)
 
-    # En el caso de que el pago se haya efectuado correctamente:
-    if response['status'] == "AUTHORIZED":
-        suma = 0
-        numero_boleta = len(boleta.objects.all()) + 1
-        for key, i in compra.compra.items():
-            suma = int(i["total"]) + suma
-        boleta.objects.create(codigo_boleta=numero_boleta, cantidad_productos=len(compra.compra.items()), total=suma, estado=False)  # Establecer estado en False
+        # En el caso de que el pago se haya efectuado correctamente:
+        if response['status'] == "AUTHORIZED":
+            suma = 0
+            numero_boleta = len(boleta.objects.all()) + 1
+            fecha_actual= date.today()
+            for key, i in compra.compra.items():
+                suma = int(i["total"]) + suma
+            boleta.objects.create(codigo_boleta=numero_boleta, cantidad_productos=len(compra.compra.items()), total=suma, estado="Pagado", fecha=fecha_actual)  
+            # Tipos de estado:
+            # Pagado -> Cuando recien se efecuta la compra
+            # Aceptado / Rechazado 
+            # Enviado
+            # Entregado
 
-        for key, i in compra.compra.items():
-            compras.objects.create(nombre_producto=i["nombre"], boleta=Boleta.objects.get(codigo_boleta=numero_boleta), cantidad=i["cantidad"], total=i["total"])
-            producto=Producto.objects.get(codigo_producto=i["producto_id"])
-            producto.stock=producto.stock-int(i["cantidad"]) #Con esto ya se estaría descontando la cantidad comprada del stock
-            producto.save()
+            for key, i in compra.compra.items():
+                compras.objects.create(nombre_producto=i["nombre"], boleta=Boleta.objects.get(codigo_boleta=numero_boleta), cantidad=i["cantidad"], total=i["total"])
+                producto=Producto.objects.get(codigo_producto=i["producto_id"])
+                producto.stock=producto.stock-int(i["cantidad"]) #Con esto ya se estaría descontando la cantidad comprada del stock
+                producto.save()
 
-        context["mensaje"] = "Has realizado tu compra exitosamente, tu número de boleta es: " + str(numero_boleta)
-        limpiar_carrito(request) #Esto es para que se limpie el carrito una vez realizada la compra
+            context["mensaje"] = "Has realizado tu compra exitosamente, tu número de boleta es: " + str(numero_boleta)
+            limpiar_carrito(request) #Esto es para que se limpie el carrito una vez realizada la compra
 
-    return render(request, 'resultado_pago.html', context)
+            return render(request, 'resultado_pago.html', context)
+        
+        else:
+            context["mensaje"]="Al parecer ha ocurrido un error al realizad tu compra, intentalo nuevamente más tarde."
+            context["error"]=1
+            return render(request, 'resultado_pago.html', context)
+    except:
+        return redirect(to='index')
 
 
 

@@ -1,0 +1,83 @@
+.contenedor_perfil{
+    background-color: #ffffff;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    margin-left: 35%;
+    margin-right: 35%;
+    margin-top: 150px;
+    border-radius: 20px;
+    margin-bottom: -50px;
+}
+
+.contenedor_perfil > h2 {
+    grid-column: 1/-1;
+    justify-self: center;
+}
+
+.image_perfil{
+    width: 200px;
+    height: 200px;
+    border-radius: 1000px;
+    border: 1px solid #000;
+}
+
+.contenedor_perfil > .foto_perfil {
+    grid-column: 1/-1;
+    justify-self: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.contenedor_perfil > .cuerpo_perfil{
+    display: grid;
+    grid-template-rows:3;
+    text-align: start;
+    align-self: center;
+    align-content: center;
+    grid-column: 1/-1;
+    padding: 20px;
+}
+
+.contenedor_perfil > .cuerpo_perfil > h2 {
+    text-align: center;
+    padding: 10px;
+    align-self: center;
+    border-bottom: 1px solid #000;
+}
+
+
+.contenedor_perfil > .cuerpo_perfil > .parrafo_1 {
+    text-align: center;
+    padding: 10px;
+    font-size: 16px;
+    align-self: center;
+    height: auto;
+    border-bottom: 1px solid #000;
+}
+
+.contenedor_perfil > .form_style {
+    grid-column: 1/-1;
+    display: grid;
+    padding: 10px;
+    grid-template-columns: repeat(2,1fr);
+}
+
+.contenedor_perfil > .form_style > .field_style {
+    grid-column: 1/-1;
+    text-align: center;
+    justify-self: center;
+}
+
+.contenedor_perfil > .form_style > .form_image{
+    grid-column: 1/-1;
+    padding: 10px;
+    text-align: center;
+    justify-self: center;
+}
+
+.contenedor_perfil > .form_style > .boton_form{
+    grid-column: 1/-1;
+    padding: 10px;
+    text-align: center;
+    justify-self: center;
+}

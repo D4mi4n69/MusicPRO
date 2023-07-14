@@ -29,20 +29,13 @@ class Producto(models.Model):
     def __str__(self):
         return self.nombre
     
-class Entrega(models.Model):
-    codigo_entrega = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=100, verbose_name="Nombre del Producto")
-    confirmacion = models.BooleanField(null=False, blank=False)
-
-    def __str__(self):
-        return self.codigo_entrega
-    
 
 class Boleta(models.Model):
-    estado = models.BooleanField(default=False)
+    estado = models.CharField(max_length=50, verbose_name="Estado del Producto")
     codigo_boleta = models.AutoField(primary_key=True)
     cantidad_productos=models.IntegerField()
     total = models.IntegerField()
+    fecha = models.DateField()
 
     def __int__(self):
         return self.codigo_boleta

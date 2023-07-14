@@ -1,0 +1,72 @@
+.contenedor{
+    background-color: #ffff;
+    display: grid;
+    grid-template-columns: repeat(2 ,1fr);
+    margin-left: 20%;
+    margin-right: 20%;
+    padding: 20px;
+    border-radius: 15px;
+    gap: 1em;
+    transition: all 0.5s;
+}
+
+.contenedor_carrito{
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 15px;
+    margin-left: 20%;
+    margin-right: 20%;
+}
+
+.contenedor > .input_info{
+    justify-self: start;
+}
+
+.contenedor > h2{
+    justify-self: center;
+    grid-column: 1/-1;
+    padding-bottom: 10px;
+}
+
+.contenedor > .input_info1 > label, input, select{
+    width: 100%;
+    justify-self: end;
+}
+
+.contenedor > .input_info1 > label{
+    font-weight: 600;
+}
+
+.contenedor > .input_info2 > label, input, select{
+    width: 100%;
+    justify-self: start;
+}
+
+.contenedor > .input_info2 > label{
+    font-weight: 600;
+}
+
+.contenedor > .input_info > input,select{
+    border-radius: 5px;
+    border: 0.5px solid black;
+    padding: 5px;
+}
+.boton {
+    background-color: #007BFF;
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    width: 150px;
+    grid-column: 1/-1;
+    justify-self: center;
+    border: none;
+    color: #ffff;
+}
+
+
+
+@media screen and (max-width: 768px) {
+    .contenedor > .input_info{
+        grid-column: 1/-1;
+    }
+}

@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+{% load crispy_forms_tags %}
+<div class="row mt-5">
+    <div class="col-12 col-md-6 offset-md-3">
+        <div class="card">
+            <div class="card-body">
+                <a href="{% url 'registro_entrega' %}">Volver</a>
+                <h2 class="text-center">Confirmar Entrega de Pedido</h2> <hr>
+                <form action="#" method="post" id="formulario2" enctype="multipart/form-data">
+
+                    {% csrf_token %}
+                    {{form | crispy}}                    
+                    <div class="d-flex justify-content-center">
+                        <input type="submit" value="Pedido Entregado" name="value" class="btn btn-primary btn-sm">
+                    </div>
+                    
+
+
+                </form> 
+            </div> 
+        </div>
+        
+    </div>
+</div>
+{% endblock %}
