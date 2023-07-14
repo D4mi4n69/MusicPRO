@@ -1,4 +1,7 @@
-from django.http import Http404, JsonResponse
+from io import BytesIO
+import os
+from django.conf import settings
+from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth import authenticate, login
 from .models import Producto, Categoria, Entrega, Boleta, Compras
@@ -7,14 +10,17 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from musicproapp.compra import Carrito, Compra
 from django.core.paginator import Paginator
 from django.contrib import messages
-
 from transbank.error.transbank_error import TransbankError
 from transbank.webpay.webpay_plus.transaction import Transaction
-
-
+import matplotlib.pyplot as plt
 import random
 import requests
-
+from django.db.models import Sum
+from django.contrib.auth.models import User
+from reportlab.pdfgen import canvas
+from django.http import HttpResponse
+from django.template.loader import get_template
+from xhtml2pdf import pisa
 
 def index(request):
     categorias = Categoria.objects.all() 
@@ -361,5 +367,97 @@ def perfil(request):
 
     return render(request, 'perfil.html', context)
 
+
+
+def generar_pdf(request):
+    template_path = 'admin/informe_ventas.html'
+    context = {}  
+
+    # Cargar la plantilla HTML
+    template = get_template(template_path)
+    html = template.render(context)
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="informe_ventas.pdf"'
+
+    pisa_status = pisa.CreatePDF(html, dest=response)
+    if pisa_status.err:
+        return HttpResponse('Error al generar el PDF', status=500)
+
+    return response
+
+
+
+def informe_ventas(request):
+# Obtener los productos vendidos y la cantidad total de ventas por producto
+    ventas_por_producto = Compras.objects.values('nombre_producto').annotate(total_ventas=Sum('cantidad')).order_by('-total_ventas')[:5]
+    productos = [venta['nombre_producto'] for venta in ventas_por_producto]
+    total_ventas = [venta['total_ventas'] for venta in ventas_por_producto]
+
+    cantidad_total_ventas = sum(total_ventas)
+
+    # Obtener la cantidad de productos
+    cantidad_productos = Producto.objects.count()
+
+    # Obtener la cantidad de usuarios registrados
+    cantidad_usuarios = User.objects.count()
+
+    # Obtener los ingresos ganados (suma del campo 'total' de Compras)
+    ingresos_ganados = Compras.objects.aggregate(total_ingresos=Sum('total'))['total_ingresos'] or 0
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="informe_ventas.pdf"'
+
+    buffer = BytesIO()
+
+    # Crear el documento PDF
+    p = canvas.Canvas(buffer)
+
+    # Agregar contenido al PDF
+    p.setFont("Helvetica", 12)
+    p.drawString(100, 800, "Informe de Ventas")
+    p.drawString(100, 750, "Productos más vendidos:")
+
+    y_position = 720
+    for producto, ventas in zip(productos, total_ventas):
+        p.drawString(120, y_position, f"- {producto}: {ventas} unidades")
+        y_position -= 20
+
+    p.drawString(100, y_position, f"Cantidad total de productos vendidos: {cantidad_total_ventas}")
+    p.drawString(100, y_position - 20, f"Ingresos ganados: ${ingresos_ganados:,.0f}")
+
+    # Finalizar el documento PDF
+    p.showPage()
+    p.save()
+
+    # Obtener el valor del buffer y añadirlo a la respuesta
+    pdf = buffer.getvalue()
+    buffer.close()
+    response.write(pdf)
+
+    # Configurar los colores y etiquetas para el gráfico circular
+    colores = ['blue', 'green', 'orange', 'red', 'purple']
+    etiquetas = productos
+
+    # Crear el gráfico circular
+    plt.pie(total_ventas, labels=etiquetas, colors=colores, autopct='%1.1f%%')
+    plt.title('Informe de Ventas')
+
+    # Guardar el gráfico en un archivo
+    plt.savefig(os.path.join(settings.MEDIA_ROOT, 'informe_ventas.png'))
+
+    # Obtener la URL del gráfico generado
+    url_informe_ventas = os.path.join(settings.MEDIA_URL, 'informe_ventas.png')
+
+    # Agregar los valores al contexto
+    context = {
+        'url_informe_ventas': url_informe_ventas,
+        'cantidad_total_ventas': cantidad_total_ventas,
+        'cantidad_productos': cantidad_productos,
+        'cantidad_usuarios': cantidad_usuarios,
+        'ingresos_ganados': ingresos_ganados
+    }
+
+    return render(request, 'admin/informe_ventas.html', context)
 
 

@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <h2>Reporte de Ventas</h2>
+
+    <div class="row mt-5 mb-5">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Productos más vendidos en el mes</h5>
+                    <img src="{{ url_informe_ventas }}" class="img-fluid" alt="Gráfico de Ventas">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Estadísticas mensuales</h5>
+                    <p class="card-text">Cantidad total de ventas: {{ cantidad_total_ventas }}</p>
+                    <p class="card-text">Cantidad de productos en el catálogo: {{ cantidad_productos }}</p>
+                    <p class="card-text">Cantidad de usuarios registrados: {{ cantidad_usuarios }}</p>
+                    <p class="card-text">Cantidad de ingresos ganados: ${{ ingresos_ganados }}</p>
+                    <a href="{% url 'generar_pdf' %}" class="btn btn-primary">Generar Informe PDF</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
