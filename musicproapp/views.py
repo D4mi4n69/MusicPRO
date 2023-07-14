@@ -15,6 +15,7 @@ from transbank.webpay.webpay_plus.transaction import Transaction
 import matplotlib.pyplot as plt
 import random
 import requests
+from datetime import date
 from django.db.models import Sum
 from django.contrib.auth.models import User
 from reportlab.pdfgen import canvas
@@ -271,7 +272,6 @@ def limpiar_comprapreliminar(request):
 
  #------------------------------------------------------------------- Vendedor -----------------------------------------------------------
 @login_required
-@user_passes_test(lambda u: u.is_superuser)
 def registro_producto(request):
     producto = Boleta.objects.all().order_by('codigo_boleta').filter(estado="Pagado")
 
@@ -281,7 +281,6 @@ def registro_producto(request):
     return render(request, 'vendedor/registro-entrega.html', context)
 
 @login_required
-@user_passes_test(lambda u: u.is_superuser)
 def confirmar_producto(request, id):
     productos = get_object_or_404(Boleta, codigo_boleta=id)
     context = {
@@ -339,7 +338,6 @@ def confirmar_despacho(request, id):
  #------------------------------------------------------------------- Contador -----------------------------------------------------------
 
 @login_required
-@user_passes_test(lambda u: u.is_superuser)
 def registro_entrega(request):
     producto = Boleta.objects.all().order_by('codigo_boleta').filter(estado="Despachado")
 
@@ -349,7 +347,6 @@ def registro_entrega(request):
     return render(request, 'contador/registro-entrega.html', context)
 
 @login_required
-@user_passes_test(lambda u: u.is_superuser)
 def confirmar_entrega(request, id):
     productos = get_object_or_404(Boleta, codigo_boleta=id)
     context = {
